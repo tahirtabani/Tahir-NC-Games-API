@@ -1,4 +1,4 @@
-const { fetchCategories } = require("../models/nc_games.models");
+const { fetchCategories } = require("../models/categories.models");
 
 exports.getCategories = (req, res, next) => {
   fetchCategories()
