@@ -38,7 +38,7 @@ describe("/api/categories", () => {
         .get("/api/categorrry")
         .expect(404)
         .then(({ body }) => {
-          expect(body.msg).toBe("Path not found");
+          expect(body.message).toBe("Path not found");
         });
     });
   });
@@ -80,6 +80,36 @@ describe('"/api/reviews/:reviews_id', () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.message).toBe("Invalid datatype found");
+      });
+  });
+});
+
+describe("3. GET /api/users", () => {
+  test("200: respond with an array of user objects containing the correct keys and properties", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        const { users } = body;
+        expect(users).toBeInstanceOf(Array);
+        expect(users).toHaveLength(4);
+        users.forEach((user) => {
+          expect(user).toEqual(
+            expect.objectContaining({
+              avatar_url: expect.any(String),
+              name: expect.any(String),
+              username: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+  test("404: responds with correct error status when invalid path used", () => {
+    return request(app)
+      .get("/api/usersss")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Path not found");
       });
   });
 });
