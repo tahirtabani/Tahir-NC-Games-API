@@ -181,4 +181,14 @@ describe("PATCH /api/reviews/review_id", () => {
         expect(body.message).toBe("Review ID does not exist");
       });
   });
+  test("400: return an error message when inc-votes is missing", () => {
+    const votes = { inc_votes: {} };
+    return request(app)
+      .patch("/api/reviews/5")
+      .send(votes)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Invalid datatype found");
+      });
+  });
 });
