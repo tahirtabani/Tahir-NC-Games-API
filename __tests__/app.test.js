@@ -46,7 +46,7 @@ describe("/api/categories", () => {
 
 describe('"/api/reviews/:reviews_id', () => {
   describe("GET", () => {
-    test("200: returns an object containing information on requested review", () => {
+    test("200: returns an object containing information on requested review (with comment count)", () => {
       return request(app)
         .get("/api/reviews/3")
         .expect(200)
@@ -62,6 +62,7 @@ describe('"/api/reviews/:reviews_id', () => {
             category: "social deduction",
             created_at: "2021-01-18T10:01:41.251Z",
             votes: 5,
+            comment_count: "3",
           });
         });
     });
