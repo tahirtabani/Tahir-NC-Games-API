@@ -193,3 +193,72 @@ describe("PATCH /api/reviews/review_id", () => {
       });
   });
 });
+
+describe("GET api/reviews", () => {
+  test("200: should return all reviews ", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        console.log("reviews: ", reviews);
+        expect(reviews).toBeInstanceOf(Array);
+        expect(reviews).toHaveLength(13);
+        reviews.forEach((review) => {
+          expect(review).toEqual(
+            expect.objectContaining({
+              review_id: expect.any(Number),
+              owner: expect.any(String),
+              title: expect.any(String),
+              category: expect.any(String),
+              review_img_url: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              designer: expect.any(String),
+              comment_count: expect.any(Number),
+            })
+          );
+        });
+      });
+  });
+  test("should respond with an array of objects sorted by date in DESC order", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+  test("should return all reviews by the category query", () => {
+    return request(app)
+      .get("/api/reviews?category=dexterity")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews.length > 0).toBe(true);
+        reviews.forEach((review) => {
+          expect(review).toHaveProperty("category", "dexterity");
+        });
+      });
+  });
+  test("200: returns an empty array when the query exists but has no reviews", () => {
+    return request(app)
+      .get("/api/reviews?category=children's+games")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toEqual([]);
+      });
+  });
+  test("404: returns a message when there is a category which does not exist", () => {
+    return request(app)
+      .get("/api/reviews?category=banana")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("banana not found");
+      });
+  });
+});

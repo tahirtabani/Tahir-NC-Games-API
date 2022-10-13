@@ -34,3 +34,40 @@ exports.updateReviewById = (id, inc_votes) => {
       }
     });
 };
+
+exports.selectReviews = (category) => {
+  let formatStr = `SELECT reviews. *, COUNT(comments) ::INT AS comment_count FROM reviews LEFT JOIN comments ON comments.review_id = reviews.review_id`;
+
+  let queryValue = [];
+  const validCategories = [
+    "euro game",
+    "strategy",
+    "hidden-roles",
+    "dexterity",
+    "push-your-luck",
+    "roll-and-write",
+    "deck-building",
+    "engine-building",
+    "children's games",
+  ];
+
+  if (category) {
+    if (!validCategories.includes(category)) {
+      return Promise.reject({
+        status: 404,
+        message: `${category} not found`,
+      });
+    } else {
+      formatStr += ` WHERE category = $1`;
+      queryValue.push(category);
+    }
+  }
+  formatStr += ` GROUP BY reviews.review_id ORDER BY created_at DESC`;
+
+  return db
+    .query(formatStr, queryValue)
+
+    .then((results) => {
+      return results.rows;
+    });
+};
