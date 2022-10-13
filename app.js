@@ -8,6 +8,7 @@ const {
   handleCustomErrors,
 } = require("./controllers/errors.controller");
 const {
+  getReviews,
   getReviewById,
   patchReviewById,
 } = require("./controllers/reviews.controller");
@@ -16,7 +17,7 @@ const { getUsers } = require("./controllers/users.controller");
 app.use(express.json());
 
 app.get("/api/categories", getCategories);
-
+app.get("/api/reviews", getReviews);
 app.get("/api/reviews/:review_id", getReviewById);
 
 app.get("/api/users", getUsers);
