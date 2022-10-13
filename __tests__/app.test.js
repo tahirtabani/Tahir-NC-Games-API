@@ -201,7 +201,7 @@ describe("GET api/reviews", () => {
       .expect(200)
       .then(({ body }) => {
         const { reviews } = body;
-        console.log("reviews: ", reviews);
+
         expect(reviews).toBeInstanceOf(Array);
         expect(reviews).toHaveLength(13);
         reviews.forEach((review) => {
