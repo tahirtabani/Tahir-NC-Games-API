@@ -389,3 +389,38 @@ describe("POST /api/reviews/:review_id/comments", () => {
       });
   });
 });
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("204: Should delete comment with associated id ", () => {
+    const comment_id = 1;
+    return request(app)
+      .delete(`/api/comments/${comment_id}`)
+      .expect(204)
+      .then(() => {
+        return request(app)
+          .delete(`/api/comments/${comment_id}`)
+          .expect(404)
+          .then(({ body: { message } }) => {
+            expect(message).toBe(`${comment_id} does not exist`);
+          });
+      });
+  });
+  test("400:responds with correct error status when invalid datatype used", () => {
+    const comment_id = "banana";
+    return request(app)
+      .delete(`/api/comments/${comment_id}`)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Invalid datatype found");
+      });
+  });
+  test("404: returns an error message when passed correct data type but a comment_id that does not exist", () => {
+    const comment_id = 981;
+    return request(app)
+      .delete(`/api/comments/${comment_id}`)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe(`${comment_id} does not exist`);
+      });
+  });
+});
