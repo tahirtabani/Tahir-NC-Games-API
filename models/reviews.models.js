@@ -35,7 +35,46 @@ exports.updateReviewById = (id, inc_votes) => {
     });
 };
 
-exports.selectReviews = (category) => {
+exports.selectReviews = (category, sort_by = "created_at", order = "DESC") => {
+  const validSort_byQueries = [
+    "review_id",
+    "title",
+    "review_body",
+    "designer",
+    "review_img_url",
+    "votes",
+    "category",
+    "owner",
+    "created_at",
+    "comment_count",
+  ];
+  const validOrderQueries = ["ASC", "DESC"];
+
+  if (
+    !validSort_byQueries.includes(sort_by.toLowerCase()) &&
+    sort_by !== undefined
+  ) {
+    return Promise.reject({
+      status: 400,
+      message: "Sort_by value does not exist",
+    });
+  }
+  if (!validOrderQueries.includes(order.toUpperCase()) && order !== undefined) {
+    return Promise.reject({
+      status: 400,
+      message: "Order does not exist - use asc or desc",
+    });
+  }
+  // if (
+  //   !validSort_byQueries.includes(sort_by.toLowerCase()) ||
+  //   !validOrderQueries.includes(order.toUpperCase())
+  // ) {
+  //   return Promise.reject({
+  //     status: 400,
+  //     msg: "Invalid queries. Reconsider query options.",
+  //   });
+  // }
+
   let formatStr = `SELECT reviews. *, COUNT(comments) ::INT AS comment_count FROM reviews LEFT JOIN comments ON comments.review_id = reviews.review_id`;
 
   let queryValue = [];
@@ -62,7 +101,7 @@ exports.selectReviews = (category) => {
       queryValue.push(category);
     }
   }
-  formatStr += ` GROUP BY reviews.review_id ORDER BY created_at DESC`;
+  formatStr += ` GROUP BY reviews.review_id ORDER BY ${sort_by.toLowerCase()} ${order.toUpperCase()}`;
 
   return db
     .query(formatStr, queryValue)

@@ -28,10 +28,12 @@ exports.patchReviewById = (req, res, next) => {
 };
 
 exports.getReviews = (req, res, next) => {
-  const { category } = req.query;
-  selectReviews(category)
+  const { category, sort_by, order } = req.query;
+
+  const promises = [selectReviews(category, sort_by, order)];
+  Promise.all(promises)
     .then((reviews) => {
-      res.status(200).send({ reviews });
+      res.status(200).send({ reviews: reviews[0] });
     })
     .catch((err) => {
       next(err);

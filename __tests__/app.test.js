@@ -194,7 +194,7 @@ describe("PATCH /api/reviews/review_id", () => {
   });
 });
 
-describe("GET api/reviews", () => {
+describe.only("GET api/reviews", () => {
   test("200: should return all reviews ", () => {
     return request(app)
       .get("/api/reviews")
@@ -259,6 +259,65 @@ describe("GET api/reviews", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.message).toBe("banana not found");
+      });
+  });
+  test(" 200 - returns array of reviews sorted by comment_count in descending order", () => {
+    return request(app)
+      .get("/api/reviews?sort_by=comment_count")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toBeSortedBy("comment_count", {
+          descending: true,
+        });
+      });
+  });
+  test("200 - returns array of reviews sorted by created_at by defualt in asccending order", () => {
+    return request(app)
+      .get("/api/reviews?order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toBeSortedBy("created_at", {
+          descending: false,
+        });
+      });
+  });
+  test("200 - returns array of reviews in ascending order", () => {
+    return request(app)
+      .get("/api/reviews?order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toBeSortedBy("created_at", { descending: false });
+      });
+  });
+
+  test("200 - returns array of reviews in filtered by category", () => {
+    return request(app)
+      .get("/api/reviews?category=dexterity")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        reviews.forEach((review) => {
+          expect(review.category).toBe("dexterity");
+        });
+      });
+  });
+  test("ERROR - status 400 - returns bad request when sorting by non-existent column", () => {
+    return request(app)
+      .get("/api/reviews?sort_by=nocolumn")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Sort_by value does not exist");
+      });
+  });
+  test("ERROR - status 400 - returns bad request when ordering by something other than ASC or DESC", () => {
+    return request(app)
+      .get("/api/reviews?order=banana")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Order does not exist - use asc or desc");
       });
   });
 });
