@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-
+const cors = require("cors");
 const { getCategories } = require("./controllers/categories.controller");
 const {
   handleInternalErrors,
@@ -18,6 +18,7 @@ const { getUsers } = require("./controllers/users.controller");
 const { deleteCommentById } = require("./controllers/comments.controller");
 const { getAPI } = require("./controllers/endpoints.controller");
 
+app.use(cors());
 app.use(express.json());
 
 app.get("/api", getAPI);
